@@ -1,0 +1,17 @@
+{
+  "name": "desc_password_sgedu",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "license": "MIT",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "fs": "^0.0.1-security",
+    "googleapis": "^105.0.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.7.7",
+    "pg": "^8.7.3"
+  }
+}
