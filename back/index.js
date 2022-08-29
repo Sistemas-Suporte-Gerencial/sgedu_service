@@ -1,6 +1,8 @@
 'use strict';
 import 'dotenv/config';
 import express  from 'express';
+import cors from 'cors';
+
 import validToken from './middleware/validToken.js';
 
 import userRoute from './routes/users.js';
@@ -10,6 +12,8 @@ import administratorRoute from './routes/administrator.js';
 import preEnrollment from './routes/pre-enrollment.js';
 
 const app = express();
+
+app.use(cors());
 
 const port = process.env.PORT || 3000;
 
