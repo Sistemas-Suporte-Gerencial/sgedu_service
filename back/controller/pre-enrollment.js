@@ -22,7 +22,7 @@ export const parameters = async (req, res) => {
 
 export const schools = async (req, res) => {
     try {
-        const sql = `SELECT * FROM escola ORDER BY nm_escola`;
+        const sql = `SELECT * FROM escola WHERE id_escola <> 85 ORDER BY nm_escola`;
 
         const response = await pool.query(sql);
 
