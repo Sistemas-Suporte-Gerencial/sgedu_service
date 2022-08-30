@@ -40,7 +40,7 @@ export const schools = async (req, res) => {
 
 export const classes = async (req, res) => {
     try {
-        const {class_id} = req.body;
+        const {school_id} = req.body;
 
         const sql = `SELECT DISTINCT
                         t.id_turma as id,
@@ -48,16 +48,17 @@ export const classes = async (req, res) => {
                     FROM
                         turma t
                     JOIN matricula m ON m.id_turma = t.id_turma
-                    JOIN serie_multiseries sm ON sm.id_serie = m.id_serie
-                    JOIN curso_serie_multiseries csm ON csm.id_curso_serie = t.id_curso_serie
-                    JOIN turno t2 ON t2.id_turno = csm.id_turno 
-                    JOIN curso_multiseries cm ON cm.id_curso = csm.id_curso
+                    JOIN curso_serie csm ON csm.id_curso_serie = t.id_curso_serie
+                    JOIN serie sm ON sm.id_serie = csm.id_serie
+                    JOIN turno t2 ON t2.id_turno = csm.id_turno
+                    JOIN curso cm ON cm.id_curso = csm.id_curso
                     JOIN sala s ON s.id_sala = t.id_sala
                     WHERE
-                        csm.id_escola = ${class_id} AND
+                        csm.id_escola = ${school_id} AND
                         t.id_anoletivo = (SELECT i.id_anoletivo FROM instituicao i LIMIT 1)
-                    ORDER BY 
+                    ORDER BY
                         name`;
+        console.log(sql);
 
         const response = await pool.query(sql);
 
