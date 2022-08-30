@@ -40,7 +40,7 @@ export const schools = async (req, res) => {
 
 export const classes = async (req, res) => {
     try {
-        const {school_id} = req.body;
+        const {school_id} = req.params;
 
         const sql = `SELECT DISTINCT
                         t.id_turma as id,
