@@ -44,7 +44,8 @@ export const classes = async (req, res) => {
 
         const sql = `SELECT DISTINCT
                         t.id_turma as id,
-                        upper(cm.ds_curso || ' ' || sm.ds_serie || ' (' || t2.ds_turno || ')' || ' (' || t.sigla  ||  ') ' || ' ' ||  s.ds_sala) AS name
+                        upper(cm.ds_curso || ' ' || sm.ds_serie || ' (' || t2.ds_turno || ')' || ' (' || t.sigla  ||  ') ' || ' ' ||  s.ds_sala) AS name,
+                        csm.id_curso as course_id
                     FROM
                         turma t
                     JOIN matricula m ON m.id_turma = t.id_turma
