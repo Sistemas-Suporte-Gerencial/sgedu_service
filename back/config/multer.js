@@ -6,9 +6,9 @@ export const storage = diskStorage({
     destination: (req, file, cb) => {
         const {class_id, school_id} = req.body;
 
-        if(!school_id || !class_id) {
-            return cb('Missing school or class id');
-        }
+        // if(!school_id || !class_id) {
+        //     return cb('Missing school or class id');
+        // }
 
         const dir = `./uploads/${school_id}/${class_id}`;
         

@@ -78,7 +78,7 @@ export const classes = async (req, res) => {
 
 export const insertNewPreEnrollment = async (req, res) => {
     try {
-        const {...data} = req.body;
+        const {...data} = JSON.parse(req.body.dataObject);
         const files = req.files;
 
         const sql = `INSERT INTO prematricula_fundaj (${Object.keys(data).join(',')}) VALUES (${Object.values(data).map((value) => typeof value === 'number' ? value : `'${value}'`).join(',')}) RETURNING id_prematricula`;
