@@ -61,7 +61,6 @@ export const classes = async (req, res) => {
                         t.id_anoletivo = (SELECT i.id_anoletivo FROM instituicao i LIMIT 1)
                     ORDER BY
                         name`;
-        console.log(sql);
 
         const response = await pool.query(sql);
 

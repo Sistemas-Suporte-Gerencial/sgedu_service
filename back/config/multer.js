@@ -4,10 +4,14 @@ import {mkdirSync, existsSync} from "fs";
 
 export const storage = diskStorage({
     destination: (req, file, cb) => {
-        const {id_turma} = req.body;
+        const {class_id, school_id} = req.body;
 
-        const dir = `./uploads/${id_turma}`;
+        if(!school_id || !class_id) {
+            return cb('Missing school or class id');
+        }
 
+        const dir = `./uploads/${school_id}/${class_id}`;
+        
         if(!existsSync(dir)){
             mkdirSync(dir, { recursive: true });
         }
