@@ -4,7 +4,9 @@ const pool = initDb('sgedu_fundaj');
 
 export const parameters = async (req, res) => {
     try {
-        const sql = `SELECT * FROM parametros_pre_matricula`;
+        const {course_id} = req.params;
+
+        const sql = `SELECT * FROM parametros_pre_matricula WHERE id_curso = ${course_id}`;
 
         const response = await pool.query(sql);
 
