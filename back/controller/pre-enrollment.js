@@ -7,12 +7,10 @@ export const parameters = async (req, res) => {
         const { course_id } = req.params;
 
         const sql = `SELECT
-                        dp.id_documento_prematricula,
-                        dp.ds_documento_prematricula
+                        dp.*
                     FROM
                         curso_documento_prematricula cdp 
-                    JOIN prematricula_documentos_fundaj pdf ON pdf.id_prematricula_documentos = id_curso_documento_prematricula 
-                    JOIN documento_prematricula dp ON dp.id_documento_prematricula = pdf.id_documento_pre_matricula
+                    JOIN documento_prematricula dp ON dp.id_documento_prematricula = cdp.id_documento_prematricula
                     WHERE
                         cdp.id_curso = ${course_id}`;
 
