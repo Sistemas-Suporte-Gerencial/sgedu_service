@@ -4,7 +4,7 @@ const pool = initDb('sgedu_fundaj');
 
 export const parameters = async (req, res) => {
     try {
-        const {course_id} = req.params;
+        const { course_id } = req.params;
 
         const sql = `SELECT
                         dp.id_documento_prematricula,
@@ -50,7 +50,7 @@ export const schools = async (req, res) => {
 
 export const classes = async (req, res) => {
     try {
-        const {school_id} = req.params;
+        const { school_id } = req.params;
 
         const sql = `SELECT DISTINCT
                         t.id_turma as id,
@@ -86,14 +86,20 @@ export const classes = async (req, res) => {
 
 export const insertNewPreEnrollment = async (req, res) => {
     try {
-        const {id_curso, id_escola, confirmEmail, ...data} = JSON.parse(req.body.dataObject);
+        const { id_curso, id_escola, confirmEmail, ...data } = JSON.parse(req.body.dataObject);
+
         const files = req.files;
+
+        await verifyCPF(data.cpf);
 
         const sql = `INSERT INTO prematricula_fundaj (${Object.keys(data).join(',')}) VALUES (${Object.values(data).map((value) => typeof value === 'number' ? value : `'${value}'`).join(',')}) RETURNING id_prematricula`;
 
         const response = await pool.query(sql);
 
         const id = response.rows[0].id_prematricula;
+
+        console.log(files);
+        return;
 
         files.map(async (file) => {
             const path = file.path.replace(/\\/g, '/');
