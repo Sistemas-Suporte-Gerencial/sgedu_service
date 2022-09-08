@@ -1,4 +1,5 @@
 import { initDb } from "../database/index.js";
+import { verifyCPF } from "../helpers/verifyCPF.js";
 
 const pool = initDb('sgedu_fundaj');
 
@@ -84,25 +85,22 @@ export const classes = async (req, res) => {
 
 export const insertNewPreEnrollment = async (req, res) => {
     try {
-        const { id_curso, id_escola, confirmEmail, ...data } = JSON.parse(req.body.dataObject);
+        const { id_curso, confirmEmail, ...data } = JSON.parse(req.body.dataObject);
 
-        const files = req.files;
-
-        await verifyCPF(data.cpf);
-
+        const { filename,  fieldname } = req.files;
+        
+        await verifyCPF(data.cpf, pool);
+        
         const sql = `INSERT INTO prematricula_fundaj (${Object.keys(data).join(',')}) VALUES (${Object.values(data).map((value) => typeof value === 'number' ? value : `'${value}'`).join(',')}) RETURNING id_prematricula`;
-
+        
         const response = await pool.query(sql);
-
+        
         const id = response.rows[0].id_prematricula;
-
-        console.log(files);
-        return;
-
+        
         files.map(async (file) => {
             const path = file.path.replace(/\\/g, '/');
 
-            const sql = `INSERT INTO prematricula_documentos_fundaj (id_prematricula, nome_documento, caminho_documento, arquivo) VALUES (${id}, '${file.filename}', '${path}', '${file.fieldname}')`;
+            const sql = `INSERT INTO prematricula_documentos_fundaj (id_prematricula, nome_documento, caminho_documento, id_documento_pre_matricula) VALUES (${id}, '${filename}', '${path}', '${fieldname}')`;
 
             await pool.query(sql);
         });
@@ -114,7 +112,7 @@ export const insertNewPreEnrollment = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             message: 'Error',
-            error
+            error: error.message
         });
     }
 }

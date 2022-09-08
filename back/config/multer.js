@@ -10,7 +10,7 @@ export const storage = diskStorage({
             return cb('Missing school or class id');
         }
 
-        const dir = `./uploads/${school_id}/${class_id}`;
+        const dir = process.env.SAVE_PATH + school_id + '/' + class_id;
         
         if(!existsSync(dir)){
             mkdirSync(dir, { recursive: true });

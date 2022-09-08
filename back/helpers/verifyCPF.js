@@ -1,6 +1,6 @@
-export const verifyCPF = async (cpf) => {
+export const verifyCPF = async (cpf, pool) => {
     try {
-        const sql = `SELECT p.cpf FROM pessoa p WHERE p.cpf = '${cpf}'`;
+        const sql = `SELECT pf.cpf FROM prematricula_fundaj pf WHERE pf.cpf = '${cpf}'`;
 
         const response = await pool.query(sql);
 

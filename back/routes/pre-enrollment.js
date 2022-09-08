@@ -1,8 +1,8 @@
-import {Router} from 'express';
+import { Router } from 'express';
 import multer from "multer";
-import {storage, limits, fileFilter} from "../config/multer.js";
+import { storage, limits, fileFilter } from "../config/multer.js";
 
-import {parameters, insertNewPreEnrollment, schools, classes} from '../controller/pre-enrollment.js';
+import { parameters, insertNewPreEnrollment, schools, classes } from '../controller/pre-enrollment.js';
 
 const upload = multer({storage, limits, fileFilter});
 
