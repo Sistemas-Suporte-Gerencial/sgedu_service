@@ -100,7 +100,7 @@ export const insertNewPreEnrollment = async (req, res) => {
         files.map(async (file) => {
             const path = file.path.replace(/\\/g, '/');
 
-            const sql = `INSERT INTO prematricula_documentos_fundaj (id_prematricula, nome_documento, caminho_documento, id_documento_pre_matricula) VALUES (${id}, '${filename}', '${path}', '${fieldname}')`;
+            const sql = `INSERT INTO prematricula_documentos_fundaj (id_prematricula, nome_documento, caminho_documento, id_documento_pre_matricula) VALUES (${id}, '${filename}', '${path}', ${fieldname})`;
 
             await pool.query(sql);
         });
