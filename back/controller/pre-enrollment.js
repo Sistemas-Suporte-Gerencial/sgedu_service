@@ -87,7 +87,7 @@ export const insertNewPreEnrollment = async (req, res) => {
     try {
         const { id_curso, confirmEmail, ...data } = JSON.parse(req.body.dataObject);
 
-        const { filename,  fieldname, ...files } = req.files;
+        const files = req.files;
         
         await verifyCPF(data.cpf, pool);
         
@@ -100,7 +100,7 @@ export const insertNewPreEnrollment = async (req, res) => {
         files.map(async (file) => {
             const path = file.path.replace(/\\/g, '/');
 
-            const sql = `INSERT INTO prematricula_documentos_fundaj (id_prematricula, nome_documento, caminho_documento, id_documento_pre_matricula) VALUES (${id}, '${filename}', '${path}', ${fieldname})`;
+            const sql = `INSERT INTO prematricula_documentos_fundaj (id_prematricula, nome_documento, caminho_documento, id_documento_pre_matricula) VALUES (${id}, '${file.filename}', '${path}', ${file.fieldname})`;
 
             await pool.query(sql);
         });
@@ -112,7 +112,7 @@ export const insertNewPreEnrollment = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             message: 'Error',
-            error: error.message
+            error: error.message,
         });
     }
 }
