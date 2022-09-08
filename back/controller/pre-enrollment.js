@@ -99,7 +99,7 @@ export const insertNewPreEnrollment = async (req, res) => {
 
         files.map(async (file) => {
             let path = file.path.replace(/\\/g, '/');
-            path = path.split('/').slice(4).join('/');
+            path = path.split('/').slice(3).join('/');
 
             const sql = `INSERT INTO prematricula_documentos_fundaj (id_prematricula, nome_documento, caminho_documento, id_documento_pre_matricula) VALUES (${id}, '${file.filename}', '${path}', ${file.fieldname})`;
 
