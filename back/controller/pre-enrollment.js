@@ -1,5 +1,5 @@
 import { initDb } from "../database/index.js";
-import { verifyCPF } from "../helpers/verifyCPF.js";
+import { verifyData } from "../helpers/verifyData.js";
 
 const pool = initDb('sgedu_fundaj');
 
@@ -89,16 +89,17 @@ export const insertNewPreEnrollment = async (req, res) => {
 
         const files = req.files;
         
-        await verifyCPF(data.cpf, pool);
+        await verifyData(data, pool);
         
         const sql = `INSERT INTO prematricula_fundaj (${Object.keys(data).join(',')}) VALUES (${Object.values(data).map((value) => typeof value === 'number' ? value : `'${value}'`).join(',')}) RETURNING id_prematricula`;
         
         const response = await pool.query(sql);
         
         const id = response.rows[0].id_prematricula;
-        
+
         files.map(async (file) => {
-            const path = file.path.replace(/\\/g, '/');
+            let path = file.path.replace(/\\/g, '/');
+            path = path.split('/').slice(4).join('/');
 
             const sql = `INSERT INTO prematricula_documentos_fundaj (id_prematricula, nome_documento, caminho_documento, id_documento_pre_matricula) VALUES (${id}, '${file.filename}', '${path}', ${file.fieldname})`;
 
@@ -110,6 +111,7 @@ export const insertNewPreEnrollment = async (req, res) => {
             data: response.rows[0]
         });
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             message: 'Error',
             error: error.message,
