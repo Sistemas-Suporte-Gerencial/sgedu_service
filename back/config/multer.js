@@ -22,7 +22,7 @@ export const storage = diskStorage({
         randomBytes(16, (err, hash) => {
             if (err) cb(err);
     
-            file.key = `${hash.toString("hex")}-${file.originalname.trim()}`;
+            file.key = `${hash.toString("hex")}-${file.originalname.replace(/ /g,'')}`;
     
             cb(null, file.key);
         });
