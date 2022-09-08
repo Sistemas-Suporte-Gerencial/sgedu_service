@@ -20,7 +20,7 @@ export const parameters = async (req, res) => {
 
         return res.status(200).json({
             message: 'Success',
-            data: response.rows[0]
+            data: response.rows
         });
     } catch (error) {
         return res.status(500).json({
