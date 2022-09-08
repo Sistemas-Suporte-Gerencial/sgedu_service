@@ -6,7 +6,15 @@ export const parameters = async (req, res) => {
     try {
         const {course_id} = req.params;
 
-        const sql = `SELECT * FROM parametros_pre_matricula WHERE id_curso = ${course_id}`;
+        const sql = `SELECT
+                        dp.id_documento_prematricula,
+                        dp.ds_documento_prematricula
+                    FROM
+                        curso_documento_prematricula cdp 
+                    JOIN prematricula_documentos_fundaj pdf ON pdf.id_prematricula_documentos = id_curso_documento_prematricula 
+                    JOIN documento_prematricula dp ON dp.id_documento_prematricula = pdf.id_documento_pre_matricula
+                    WHERE
+                        cdp.id_curso = ${course_id}`;
 
         const response = await pool.query(sql);
 
