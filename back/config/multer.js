@@ -21,8 +21,11 @@ export const storage = diskStorage({
     filename: (req, file, cb) => {
         randomBytes(16, (err, hash) => {
             if (err) cb(err);
+
+            let fileName = file.originalname.replace(/ /g,'');
+            fileName.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     
-            file.key = `${hash.toString("hex")}-${file.originalname.replace(/ /g,'')}`;
+            file.key = `${hash.toString("hex")}-${fileName}`;
     
             cb(null, file.key);
         });
