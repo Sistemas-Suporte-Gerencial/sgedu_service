@@ -87,7 +87,7 @@ export const insertNewPreEnrollment = async (req, res) => {
     try {
         const { id_curso, confirmEmail, ...data } = JSON.parse(req.body.dataObject);
 
-        const { filename,  fieldname } = req.files;
+        const { filename,  fieldname, ...files } = req.files;
         
         await verifyCPF(data.cpf, pool);
         
