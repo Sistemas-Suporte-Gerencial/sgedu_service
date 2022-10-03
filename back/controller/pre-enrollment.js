@@ -67,7 +67,7 @@ export const classes = async (req, res) => {
                         csm.id_escola = ${school_id} AND
                         t.id_anoletivo = (SELECT i.id_anoletivo FROM instituicao i LIMIT 1) AND
                         t.prematricula = TRUE AND
-                        t.pre_matricula_vagas_restantes > 0
+                        t.pre_matricula_vagas_restantes > '0'
                     ORDER BY
                         name`;
 
