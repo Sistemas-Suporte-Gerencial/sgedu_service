@@ -10,6 +10,7 @@ import migrateRoute from './routes/migrate.js';
 import emailRoute from './routes/email.js';
 import administratorRoute from './routes/administrator.js';
 import preEnrollment from './routes/pre-enrollment.js';
+import generateReport from './routes/generateReport.js';
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/migrate', migrateRoute);
 app.use('/email', emailRoute);
 app.use('/api/administrator', administratorRoute);
 app.use('/api/pre-enrollment', preEnrollment);
+app.use('/api/report', generateReport);
 
 app.listen(port, () => {
     console.log(`Server started on port ${port}`);
