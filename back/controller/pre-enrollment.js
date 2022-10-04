@@ -57,7 +57,6 @@ export const classes = async (req, res) => {
                         csm.id_curso as course_id
                     FROM
                         turma t
-                    JOIN matricula m ON m.id_turma = t.id_turma
                     JOIN curso_serie csm ON csm.id_curso_serie = t.id_curso_serie
                     JOIN serie sm ON sm.id_serie = csm.id_serie
                     JOIN turno t2 ON t2.id_turno = csm.id_turno
