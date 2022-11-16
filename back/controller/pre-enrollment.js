@@ -1,13 +1,14 @@
 import { initDb } from "../database/index.js";
 import { verifyData } from "../helpers/verifyData.js";
+import axios from "axios";
 
-const pool = initDb('sgedu_fundaj');
+const pool = initDb("sgedu_fundaj");
 
 export const parameters = async (req, res) => {
-    try {
-        const { course_id } = req.params;
+	try {
+		const { course_id } = req.params;
 
-        const sql = `SELECT
+		const sql = `SELECT
                         dp.*
                     FROM
                         curso_documento_prematricula cdp 
@@ -15,43 +16,43 @@ export const parameters = async (req, res) => {
                     WHERE
                         cdp.id_curso = ${course_id}`;
 
-        const response = await pool.query(sql);
+		const response = await pool.query(sql);
 
-        return res.status(200).json({
-            message: 'Success',
-            data: response.rows
-        });
-    } catch (error) {
-        return res.status(500).json({
-            message: 'Error',
-            error
-        });
-    }
-}
+		return res.status(200).json({
+			message: "Success",
+			data: response.rows,
+		});
+	} catch (error) {
+		return res.status(500).json({
+			message: "Error",
+			error,
+		});
+	}
+};
 
 export const schools = async (req, res) => {
-    try {
-        const sql = `SELECT * FROM escola WHERE id_escola <> 85 ORDER BY nm_escola`;
+	try {
+		const sql = `SELECT * FROM escola WHERE id_escola <> 85 ORDER BY nm_escola`;
 
-        const response = await pool.query(sql);
+		const response = await pool.query(sql);
 
-        return res.status(200).json({
-            message: 'Success',
-            data: response.rows
-        });
-    } catch (error) {
-        return res.status(500).json({
-            message: 'Error',
-            error
-        });
-    }
-}
+		return res.status(200).json({
+			message: "Success",
+			data: response.rows,
+		});
+	} catch (error) {
+		return res.status(500).json({
+			message: "Error",
+			error,
+		});
+	}
+};
 
 export const classes = async (req, res) => {
-    try {
-        const { school_id } = req.params;
+	try {
+		const { school_id } = req.params;
 
-        const sql = `SELECT DISTINCT
+		const sql = `SELECT DISTINCT
                         t.id_turma as id,
                         upper(cm.ds_curso || ' ' || sm.ds_serie || ' (' || t2.ds_turno || ')' || ' (' || t.sigla  ||  ') ' || ' ' ||  s.ds_sala) AS name,
                         csm.id_curso as course_id
@@ -69,52 +70,71 @@ export const classes = async (req, res) => {
                     ORDER BY
                         name`;
 
-        const response = await pool.query(sql);
+		const response = await pool.query(sql);
 
-        return res.status(200).json({
-            message: 'Success',
-            data: response.rows
-        });
-    } catch (error) {
-        return res.status(500).json({
-            message: 'Error',
-            error
-        });
-    }
-}
+		return res.status(200).json({
+			message: "Success",
+			data: response.rows,
+		});
+	} catch (error) {
+		return res.status(500).json({
+			message: "Error",
+			error,
+		});
+	}
+};
 
 export const insertNewPreEnrollment = async (req, res) => {
-    try {
-        const { id_curso, confirmEmail, ...data } = JSON.parse(req.body.dataObject);
+	try {
+		const { id_curso, confirmEmail, ...data } = JSON.parse(
+			req.body.dataObject
+		);
 
-        const files = req.files;
-        
-        await verifyData(data, pool);
-        
-        const sql = `INSERT INTO prematricula_fundaj (${Object.keys(data).join(',')}) VALUES (${Object.values(data).map((value) => typeof value === 'number' ? value : `'${value}'`).join(',')}) RETURNING id_prematricula`;
-        
-        const response = await pool.query(sql);
-        
-        const id = response.rows[0].id_prematricula;
+		const files = req.files;
 
-        files.map(async (file) => {
-            let path = file.path.replace(/\\/g, '/');
-            path = path.split('/').slice(4).join('/');
+		await verifyData(data, pool);
 
-            const sql = `INSERT INTO prematricula_documentos_fundaj (id_prematricula, nome_documento, caminho_documento, id_documento_prematricula) VALUES (${id}, '${file.filename}', '${'../' + path}', ${file.fieldname})`;
+		const sql = `INSERT INTO prematricula_fundaj (${Object.keys(data).join(
+			","
+		)}) VALUES (${Object.values(data)
+			.map((value) => (typeof value === "number" ? value : `'${value}'`))
+			.join(",")}) RETURNING id_prematricula`;
 
-            await pool.query(sql);
+		const response = await pool.query(sql);
+
+		const id = response.rows[0].id_prematricula;
+
+		files.forEach(async (file) => {
+			let path = file.path.replace(/\\/g, "/");
+			path = path.split("/").slice(4).join("/");
+
+			const sql = `INSERT INTO prematricula_documentos_fundaj (id_prematricula, nome_documento, caminho_documento, id_documento_prematricula) VALUES (${id}, '${
+				file.filename
+			}', '${"../" + path}', ${file.fieldname})`;
+
+			await pool.query(sql);
+		});
+
+		const {data: dataResult} = await axios.post('http://18.188.222.42:3000/email/send', {
+            data:{
+                to:JSON.parse(
+                    req.body.dataObject
+                ).email,
+                subject:'Confirmação de pré-matrícula',
+                text:'Sua pré-matrícula foi realizada com sucesso!',
+                html:''
+            }
         });
 
-        return res.status(200).json({
-            message: 'Success',
-            data: response.rows[0]
-        });
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({
-            message: 'Error',
-            error: error.message,
-        });
-    }
-}
+		return res.status(200).json({
+			message: "Success",
+			data: response.rows[0],
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({
+			message: "Error",
+			error: error.message,
+		});
+	}
+};
