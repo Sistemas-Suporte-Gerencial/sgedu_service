@@ -116,12 +116,10 @@ export const insertNewPreEnrollment = async (req, res) => {
 		});
 
 		await axios.post('http://18.188.222.42:3000/email/send', {
-            data: {
-                to: confirmEmail,
-                subject: 'Confirmação de pré-matrícula',
-                text: 'Sua pré-matrícula foi realizada com sucesso!',
-                html: '<h1>Sua pré-matrícula foi realizada com sucesso!</h1>'
-            }
+			to: confirmEmail,
+			subject: 'Confirmação de pré-matrícula',
+			text: 'Sua pré-matrícula foi realizada com sucesso!',
+			html: '<h1>Sua pré-matrícula foi realizada com sucesso!</h1>'
         });
 
 		return res.status(200).json({
