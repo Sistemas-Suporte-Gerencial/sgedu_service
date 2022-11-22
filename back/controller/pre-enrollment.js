@@ -115,14 +115,12 @@ export const insertNewPreEnrollment = async (req, res) => {
 			await pool.query(sql);
 		});
 
-		const {data: dataResult} = await axios.post('http://18.188.222.42:3000/email/send', {
-            data:{
-                to:JSON.parse(
-                    req.body.dataObject
-                ).email,
-                subject:'Confirmação de pré-matrícula',
-                text:'Sua pré-matrícula foi realizada com sucesso!',
-                html:''
+		await axios.post('http://18.188.222.42:3000/email/send', {
+            data: {
+                to: confirmEmail,
+                subject: 'Confirmação de pré-matrícula',
+                text: 'Sua pré-matrícula foi realizada com sucesso!',
+                html: '<h1>Sua pré-matrícula foi realizada com sucesso!</h1>'
             }
         });
 
