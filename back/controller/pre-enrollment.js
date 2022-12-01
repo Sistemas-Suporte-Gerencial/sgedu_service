@@ -66,7 +66,8 @@ export const classes = async (req, res) => {
                     WHERE
                         csm.id_escola = ${school_id} AND
                         t.id_anoletivo = (SELECT i.id_anoletivo FROM instituicao i LIMIT 1) AND
-                        t.prematricula = TRUE
+                        t.prematricula = TRUE AND
+												t.limit_pre_matricula::int >= (SELECT COALESCE(count(m.id_matricula), 0) FROM matricula m WHERE m.id_turma = t.id_turma)
                     ORDER BY
                         name`;
 
@@ -120,7 +121,7 @@ export const insertNewPreEnrollment = async (req, res) => {
 			subject: 'Confirmação de pré-matrícula',
 			text: 'Sua pré-matrícula foi realizada com sucesso!',
 			html: '<h1>Sua pré-matrícula foi realizada com sucesso!</h1>'
-        });
+		});
 
 		return res.status(200).json({
 			message: "Success",
