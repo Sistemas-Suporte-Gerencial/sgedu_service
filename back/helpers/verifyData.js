@@ -1,8 +1,15 @@
 export const verifyData = async (data, pool) => {
     try {
-        const { cpf, rg } = data; 
+        const { cpf, rg, id_escola } = data; 
 
-        const sql = `SELECT pf.cpf FROM prematricula_fundaj pf WHERE pf.cpf = '${cpf}' OR pf.rg = '${rg}'`;
+        const sql = `SELECT 
+                        pf.cpf 
+                    FROM 
+                        prematricula_fundaj pf 
+                    WHERE 
+                        pf.cpf = '${cpf}' OR 
+                        pf.rg = '${rg}' AND 
+                        pf.id_escola = ${id_escola}`;
 
         const response = await pool.query(sql);
 
