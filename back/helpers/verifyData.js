@@ -9,7 +9,8 @@ export const verifyData = async (data, pool) => {
                     WHERE 
                         pf.cpf = '${cpf}' OR 
                         pf.rg = '${rg}' AND 
-                        pf.id_escola = ${id_escola}`;
+                        pf.id_escola = ${id_escola} AND
+                        pf.id_curso = ${id_curso}`;
 
         const response = await pool.query(sql);
 

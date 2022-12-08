@@ -93,7 +93,7 @@ export const insertNewPreEnrollment = async (req, res) => {
 
 		const files = req.files;
 
-		await verifyData(data, pool);
+		//await verifyData(data, pool);
 
 		const sql = `INSERT INTO prematricula_fundaj (${Object.keys(data).join(
 			","
