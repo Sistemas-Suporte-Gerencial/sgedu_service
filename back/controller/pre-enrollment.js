@@ -53,23 +53,23 @@ export const classes = async (req, res) => {
 		const { school_id } = req.params;
 
 		const sql = `SELECT DISTINCT
-                        t.id_turma as id,
-                        upper(cm.ds_curso || ' ' || sm.ds_serie || ' (' || t2.ds_turno || ')' || ' (' || t.sigla  ||  ') ' || ' ' ||  s.ds_sala) AS name,
-                        csm.id_curso as course_id
-                    FROM
-                        turma t
-                    JOIN curso_serie csm ON csm.id_curso_serie = t.id_curso_serie
-                    JOIN serie sm ON sm.id_serie = csm.id_serie
-                    JOIN turno t2 ON t2.id_turno = csm.id_turno
-                    JOIN curso cm ON cm.id_curso = csm.id_curso
-                    JOIN sala s ON s.id_sala = t.id_sala
-                    WHERE
-                        csm.id_escola = ${school_id} AND
-                        t.id_anoletivo = (SELECT i.id_anoletivo FROM instituicao i LIMIT 1) AND
-                        t.prematricula = TRUE AND
-												t.limit_pre_matricula::int >= (SELECT COALESCE(count(m.id_matricula), 0) FROM matricula m WHERE m.id_turma = t.id_turma)
-                    ORDER BY
-                        name`;
+										t.id_turma as id,
+										upper(cm.ds_curso || ' ' || sm.ds_serie || ' (' || t2.ds_turno || ')' || ' (' || t.sigla  ||  ') ' || ' ' ||  s.ds_sala) AS name,
+										csm.id_curso as course_id
+								FROM
+										turma t
+								JOIN curso_serie csm ON csm.id_curso_serie = t.id_curso_serie
+								JOIN serie sm ON sm.id_serie = csm.id_serie
+								JOIN turno t2 ON t2.id_turno = csm.id_turno
+								JOIN curso cm ON cm.id_curso = csm.id_curso
+								JOIN sala s ON s.id_sala = t.id_sala
+								WHERE
+										csm.id_escola = ${school_id} AND
+										t.id_anoletivo = (SELECT i.id_anoletivo FROM instituicao i LIMIT 1) AND
+										t.prematricula = TRUE AND
+										t.limit_pre_matricula::int >= (SELECT count(pf.id_prematricula) FROM prematricula_fundaj pf WHERE pf.id_turma = t.id_turma AND pf.id_escola = csm.id_escola)
+								ORDER BY
+										name`;
 
 		const response = await pool.query(sql);
 
