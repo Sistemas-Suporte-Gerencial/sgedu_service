@@ -145,6 +145,16 @@ export const insertNewPreEnrollment = async (req, res) => {
 export const getPersonByCpf  = async (req, res) => {
 	try {
 		const { cpf } = req.params;
+		const { id_curso: courseId } = req.body;
+		req.body.cpf = cpf;
+		const validations = ['cpf', 'id_curso']
+		for (const validation of validations) {
+			if (!req.body[validation]) {
+				return res.status(400).json({
+					message: `Missing parameter: ${validation}`,
+				});
+			}
+		}
 		let sql = `SELECT
 									pf.nome_completo,
 									pf.rg,
@@ -153,31 +163,53 @@ export const getPersonByCpf  = async (req, res) => {
 									pf.nome_certificado,
 									pf.servidor_publico,
 									pf.orgao_publico,
-									pf.nacionalidade,
+									pf.nacionalidade
 								FROM
 									prematricula_fundaj pf
 								WHERE
 									pf.cpf = '${cpf}'`;
-		const prematricula = await pool.query(sql);
-		if(prematricula.rows.length === 0) {
+		const enrollment = await pool.query(sql);
+		if(enrollment.rows.length === 0) {
 			return res.status(404).json({
 				message: "Not Found",
-				data: prematricula.rows,
+				data: enrollment.rows,
 			});
 		}
 		sql = `SELECT
-						'sgedu.suportegerencial.com.br/sistema-educacional-uni//'||pdf.caminho_documento 
+						'sgedu.suportegerencial.com.br/sistema-educacional-uni//'||pdf.caminho_documento as document_path,
+						dp.ds_documento_prematricula as document
 					FROM
 						prematricula_fundaj pf
 					JOIN prematricula_documentos_fundaj pdf ON pdf.id_prematricula = pf.id_prematricula
+					JOIN documento_prematricula dp ON dp.id_documento_prematricula = pdf.id_documento_prematricula
 					WHERE
-						pf.cpf = '52137066491'`;
-		const documentos  = await pool.query(sql);
+						pf.cpf = '${cpf}'`;
+		const documents = await pool.query(sql);
+		sql = `SELECT
+						ppm.cpf,
+						ppm.rg,
+						ppm.carteira_trabalho
+					FROM
+						parametros_pre_matricula ppm
+					WHERE
+						ppm.id_curso = ${courseId}
+					LIMIT 1`;
+		const documentNeedToSend = await pool.query(sql);
+		const documentEntries = Object.entries(documentNeedToSend.rows[0]).filter((item) => item[1] === true);
+		const documentsToSend = documentEntries.map((item) => item[0]);
+		const documentsNotSent = [];
+		documentsToSend.forEach((item) => {
+			const document = documents.rows.find((document) => document.document === item.toUpperCase());
+			if(!document) {
+				documentsNotSent.push(item);
+			}
+		})
 		return res.status(200).json({
 			message: "Success",
 			data: {
-				prematricula: prematricula.rows,
-				documentos: documentos.rows
+				enrollment: enrollment.rows,
+				documents: documents.rows,
+				documentsNotSent
 			},
 		});
 	} catch (error) {

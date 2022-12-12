@@ -11,7 +11,7 @@ const router = Router();
 router.get('/parameters/:course_id', parameters);
 router.get('/schools', schools);
 router.get('/classes/:school_id', classes);
-router.get('/person/:cpf', getPersonByCpf);
+router.post('/person/:cpf', getPersonByCpf);
 router.post('/new-enrollment', upload.any(), insertNewPreEnrollment);
 
 export default router;
