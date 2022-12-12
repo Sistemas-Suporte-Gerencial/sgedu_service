@@ -145,7 +145,7 @@ export const insertNewPreEnrollment = async (req, res) => {
 export const getPersonByCpf  = async (req, res) => {
 	try {
 		const { cpf } = req.params;
-		const sql = `SELECT
+		let sql = `SELECT
 									pf.nome_completo,
 									pf.rg,
 									pf.email,
@@ -153,21 +153,32 @@ export const getPersonByCpf  = async (req, res) => {
 									pf.nome_certificado,
 									pf.servidor_publico,
 									pf.orgao_publico,
-									pf.nacionalidade
+									pf.nacionalidade,
 								FROM
 									prematricula_fundaj pf
 								WHERE
 									pf.cpf = '${cpf}'`;
-		const response = await pool.query(sql);
-		if(response.rows.length === 0) {
+		const prematricula = await pool.query(sql);
+		if(prematricula.rows.length === 0) {
 			return res.status(404).json({
 				message: "Not Found",
-				data: response.rows,
+				data: prematricula.rows,
 			});
 		}
+		sql = `SELECT
+						'sgedu.suportegerencial.com.br/sistema-educacional-uni//'||pdf.caminho_documento 
+					FROM
+						prematricula_fundaj pf
+					JOIN prematricula_documentos_fundaj pdf ON pdf.id_prematricula = pf.id_prematricula
+					WHERE
+						pf.cpf = '52137066491'`;
+		const documentos  = await pool.query(sql);
 		return res.status(200).json({
 			message: "Success",
-			data: response.rows,
+			data: {
+				prematricula: prematricula.rows,
+				documentos: documentos.rows
+			},
 		});
 	} catch (error) {
 		return res.status(500).json({
