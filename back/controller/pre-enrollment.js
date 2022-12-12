@@ -1,5 +1,4 @@
 import { initDb } from "../database/index.js";
-import { verifyData } from "../helpers/verifyData.js";
 import axios from "axios";
 
 const pool = initDb("sgedu_fundaj");
@@ -53,23 +52,23 @@ export const classes = async (req, res) => {
 		const { school_id } = req.params;
 
 		const sql = `SELECT DISTINCT
-										t.id_turma as id,
-										upper(cm.ds_curso || ' ' || sm.ds_serie || ' (' || t2.ds_turno || ')' || ' (' || t.sigla  ||  ') ' || ' ' ||  s.ds_sala) AS name,
-										csm.id_curso as course_id
-								FROM
-										turma t
-								JOIN curso_serie csm ON csm.id_curso_serie = t.id_curso_serie
-								JOIN serie sm ON sm.id_serie = csm.id_serie
-								JOIN turno t2 ON t2.id_turno = csm.id_turno
-								JOIN curso cm ON cm.id_curso = csm.id_curso
-								JOIN sala s ON s.id_sala = t.id_sala
-								WHERE
-										csm.id_escola = ${school_id} AND
-										t.id_anoletivo = (SELECT i.id_anoletivo FROM instituicao i LIMIT 1) AND
-										t.prematricula = TRUE AND
-										t.limit_pre_matricula::int >= (SELECT count(pf.id_prematricula) FROM prematricula_fundaj pf WHERE pf.id_turma = t.id_turma AND pf.id_escola = csm.id_escola)
-								ORDER BY
-										name`;
+                        t.id_turma as id,
+                        upper(cm.ds_curso || ' ' || sm.ds_serie || ' (' || t2.ds_turno || ')' || ' (' || t.sigla  ||  ') ' || ' ' ||  s.ds_sala) AS name,
+                        csm.id_curso as course_id
+                    FROM
+                        turma t
+                    JOIN curso_serie csm ON csm.id_curso_serie = t.id_curso_serie
+                    JOIN serie sm ON sm.id_serie = csm.id_serie
+                    JOIN turno t2 ON t2.id_turno = csm.id_turno
+                    JOIN curso cm ON cm.id_curso = csm.id_curso
+                    JOIN sala s ON s.id_sala = t.id_sala
+                    WHERE
+                        csm.id_escola = ${school_id} AND
+                        t.id_anoletivo = (SELECT i.id_anoletivo FROM instituicao i LIMIT 1) AND
+                        t.prematricula = TRUE AND
+												t.limit_pre_matricula::int >= (SELECT COALESCE(count(m.id_matricula), 0) FROM matricula m WHERE m.id_turma = t.id_turma)
+                    ORDER BY
+                        name`;
 
 		const response = await pool.query(sql);
 
@@ -92,8 +91,6 @@ export const insertNewPreEnrollment = async (req, res) => {
 		);
 
 		const files = req.files;
-
-		//await verifyData(data, pool);
 
 		const sql = `INSERT INTO prematricula_fundaj (${Object.keys(data).join(
 			","
@@ -141,6 +138,41 @@ export const insertNewPreEnrollment = async (req, res) => {
 		return res.status(500).json({
 			message: "Error",
 			error: error.message,
+		});
+	}
+};
+
+export const getPersonByCpf  = async (req, res) => {
+	try {
+		const { cpf } = req.params;
+		const sql = `SELECT
+									pf.nome_completo,
+									pf.rg,
+									pf.email,
+									pf.telefone,
+									pf.nome_certificado,
+									pf.servidor_publico,
+									pf.orgao_publico,
+									pf.nacionalidade
+								FROM
+									prematricula_fundaj pf
+								WHERE
+									pf.cpf = '${cpf}'`;
+		const response = await pool.query(sql);
+		if(response.rows.length === 0) {
+			return res.status(404).json({
+				message: "Not Found",
+				data: response.rows,
+			});
+		}
+		return res.status(200).json({
+			message: "Success",
+			data: response.rows,
+		});
+	} catch (error) {
+		return res.status(500).json({
+			message: "Error",
+			error,
 		});
 	}
 };
