@@ -106,9 +106,8 @@ export const insertNewPreEnrollment = async (req, res) => {
 			let path = file.path.replace(/\\/g, "/");
 			path = path.split("/").slice(4).join("/");
 
-			const sql = `INSERT INTO prematricula_documentos_fundaj (id_prematricula, nome_documento, caminho_documento, id_documento_prematricula) VALUES (${id}, '${
-				file.filename
-			}', '${"../" + path}', ${file.fieldname})`;
+			const sql = `INSERT INTO prematricula_documentos_fundaj (id_prematricula, nome_documento, caminho_documento, id_documento_prematricula) VALUES (${id}, '${file.filename
+				}', '${"../" + path}', ${file.fieldname})`;
 
 			await pool.query(sql);
 		});
@@ -142,7 +141,7 @@ export const insertNewPreEnrollment = async (req, res) => {
 	}
 };
 
-export const getPersonByCpf  = async (req, res) => {
+export const getPersonByCpf = async (req, res) => {
 	try {
 		const { cpf } = req.params;
 		const { id_curso: courseId } = req.body;
@@ -163,13 +162,14 @@ export const getPersonByCpf  = async (req, res) => {
 									pf.nome_certificado,
 									pf.servidor_publico,
 									pf.orgao_publico,
-									pf.nacionalidade
+									pf.nacionalidade,
+									pf.cnh
 								FROM
 									prematricula_fundaj pf
 								WHERE
 									pf.cpf = '${cpf}'`;
 		const enrollment = await pool.query(sql);
-		if(enrollment.rows.length === 0) {
+		if (enrollment.rows.length === 0) {
 			return res.status(404).json({
 				message: "Not Found",
 				data: enrollment.rows,
@@ -194,7 +194,7 @@ export const getPersonByCpf  = async (req, res) => {
 					WHERE
 						cdp.id_curso = ${courseId}`;
 		const documentNeedToSend = await pool.query(sql);
-		if(documentNeedToSend.rows.length === 0) {
+		if (documentNeedToSend.rows.length === 0) {
 			return res.status(404).json({
 				message: "Documents not found",
 				data: documentNeedToSend.rows,
