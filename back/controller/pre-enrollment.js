@@ -186,7 +186,8 @@ export const getPersonByCpf  = async (req, res) => {
 						pf.cpf = '${cpf}'`;
 		const documents = await pool.query(sql);
 		sql = `SELECT
-						dp.ds_documento_prematricula as document
+						dp.id_documento_prematricula,
+						dp.ds_documento_prematricula
 					FROM
 						curso_documento_prematricula cdp
 					JOIN documento_prematricula dp ON dp.id_documento_prematricula = cdp.id_documento_prematricula
@@ -202,13 +203,12 @@ export const getPersonByCpf  = async (req, res) => {
 		const documentsNotSent = documentNeedToSend.rows.filter(document => {
 			return !documents.rows.some(documentSent => documentSent.document === document.document)
 		})
-		const documentsNotSentValues = documentsNotSent.map(document => document.document)
 		return res.status(200).json({
 			message: "Success",
 			data: {
 				enrollment: enrollment.rows,
 				documents: documents.rows,
-				documentsNotSent: documentsNotSentValues
+				documentsNotSent
 			},
 		});
 	} catch (error) {
