@@ -155,6 +155,7 @@ export const getPersonByCpf  = async (req, res) => {
 				});
 			}
 		}
+		console.log(cpf, courseId)
 		let sql = `SELECT
 									pf.nome_completo,
 									pf.rg,
@@ -195,6 +196,12 @@ export const getPersonByCpf  = async (req, res) => {
 						ppm.id_curso = ${courseId}
 					LIMIT 1`;
 		const documentNeedToSend = await pool.query(sql);
+		if(documentNeedToSend.rows.length === 0) {
+			return res.status(404).json({
+				message: "Documents not found",
+				data: documentNeedToSend.rows,
+			});
+		}
 		const documentEntries = Object.entries(documentNeedToSend.rows[0]).filter((item) => item[1] === true);
 		const documentsToSend = documentEntries.map((item) => item[0]);
 		const documentsNotSent = [];
