@@ -155,7 +155,6 @@ export const getPersonByCpf  = async (req, res) => {
 				});
 			}
 		}
-		console.log(cpf, courseId)
 		let sql = `SELECT
 									pf.nome_completo,
 									pf.rg,
@@ -187,14 +186,12 @@ export const getPersonByCpf  = async (req, res) => {
 						pf.cpf = '${cpf}'`;
 		const documents = await pool.query(sql);
 		sql = `SELECT
-						ppm.cpf,
-						ppm.rg,
-						ppm.carteira_trabalho
+						dp.ds_documento_prematricula as document
 					FROM
-						parametros_pre_matricula ppm
+						curso_documento_prematricula cdp
+					JOIN documento_prematricula dp ON dp.id_documento_prematricula = cdp.id_documento_prematricula
 					WHERE
-						ppm.id_curso = ${courseId}
-					LIMIT 1`;
+						cdp.id_curso = ${courseId}`;
 		const documentNeedToSend = await pool.query(sql);
 		if(documentNeedToSend.rows.length === 0) {
 			return res.status(404).json({
@@ -202,21 +199,16 @@ export const getPersonByCpf  = async (req, res) => {
 				data: documentNeedToSend.rows,
 			});
 		}
-		const documentEntries = Object.entries(documentNeedToSend.rows[0]).filter((item) => item[1] === true);
-		const documentsToSend = documentEntries.map((item) => item[0]);
-		const documentsNotSent = [];
-		documentsToSend.forEach((item) => {
-			const document = documents.rows.find((document) => document.document === item.toUpperCase());
-			if(!document) {
-				documentsNotSent.push(item);
-			}
+		const documentsNotSent = documentNeedToSend.rows.filter(document => {
+			return !documents.rows.some(documentSent => documentSent.document === document.document)
 		})
+		const documentsNotSentValues = documentsNotSent.map(document => document.document)
 		return res.status(200).json({
 			message: "Success",
 			data: {
 				enrollment: enrollment.rows,
 				documents: documents.rows,
-				documentsNotSent
+				documentsNotSent: documentsNotSentValues
 			},
 		});
 	} catch (error) {
