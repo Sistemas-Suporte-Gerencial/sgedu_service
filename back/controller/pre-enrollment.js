@@ -171,7 +171,15 @@ export const getPersonByCpf = async (req, res) => {
 		const enrollment = await pool.query(sql);
 		let person
 		if (enrollment.rows.length === 0) {
-			sql = `SELECT * FROM pessoa p WHERE p.cpf = '${cpf}'`;
+			sql = `SELECT 
+					p.nome as nome_completo,
+					p.email,
+					p.telefone,
+					p.nome as nome_certificado,
+					'NÃO SOU SERVIDOR PÚBLICO' as servidor_publico,
+					'NÃO INFORMADO' as orgao_publico,
+					'BRASILEIRO' as nacionalidade
+				FROM pessoa p WHERE p.cpf = '${cpf}'`;
 			person = await pool.query(sql);
 			if(person.rows.length === 0) {
 				return res.status(404).json({
