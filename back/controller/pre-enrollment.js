@@ -176,6 +176,7 @@ export const getPersonByCpf = async (req, res) => {
 					p.email,
 					p.telefone,
 					p.nome as nome_certificado,
+					p.rg,
 					'NÃO SOU SERVIDOR PÚBLICO' as servidor_publico,
 					'NÃO INFORMADO' as orgao_publico,
 					'BRASILEIRO' as nacionalidade
