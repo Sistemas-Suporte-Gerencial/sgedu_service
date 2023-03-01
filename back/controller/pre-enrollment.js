@@ -170,10 +170,14 @@ export const getPersonByCpf = async (req, res) => {
 									pf.cpf = '${cpf}'`;
 		const enrollment = await pool.query(sql);
 		if (enrollment.rows.length === 0) {
-			return res.status(404).json({
-				message: "Not Found",
-				data: enrollment.rows,
-			});
+			sql = `SELECT * FROM pessoa p WHERE p.cpf = '${cpf}'`;
+			const person = await pool.query(sql);
+			if(person.rows.length === 0) {
+				return res.status(404).json({
+					message: "Not Found",
+					data: enrollment?.rows || person?.rows,
+				});
+			}
 		}
 		sql = `SELECT
 						'sgedu.suportegerencial.com.br/sistema-educacional-uni//'||pdf.caminho_documento as document_path,
