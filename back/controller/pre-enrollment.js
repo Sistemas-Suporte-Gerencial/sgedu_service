@@ -211,7 +211,7 @@ export const getPersonByCpf = async (req, res) => {
 		return res.status(200).json({
 			message: "Success",
 			data: {
-				enrollment: enrollment.rows || person.rows,
+				enrollment: enrollment.rows ?? person.rows,
 				documents: documents.rows,
 				documentsNotSent
 			},
