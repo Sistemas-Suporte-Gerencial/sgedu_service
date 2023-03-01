@@ -208,13 +208,23 @@ export const getPersonByCpf = async (req, res) => {
 		const documentsNotSent = documentNeedToSend.rows.filter(document => {
 			return !documents.rows.some(documentSent => documentSent.document === document.document)
 		})
-		return res.status(200).json({
-			message: "Success",
-			data: {
-				enrollment: person.rows,
+		let data
+		if(enrollment.rows.length > 0) {
+			data = {
+				enrollment: enrollment.rows,
 				documents: documents.rows,
 				documentsNotSent
-			},
+			}
+		} else {
+			data = {
+				person: person.rows,
+				documents: documents.rows,
+				documentsNotSent
+			}
+		}
+		return res.status(200).json({
+			message: "Success",
+			data,
 		});
 	} catch (error) {
 		return res.status(500).json({
