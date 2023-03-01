@@ -169,9 +169,10 @@ export const getPersonByCpf = async (req, res) => {
 								WHERE
 									pf.cpf = '${cpf}'`;
 		const enrollment = await pool.query(sql);
+		let person
 		if (enrollment.rows.length === 0) {
 			sql = `SELECT * FROM pessoa p WHERE p.cpf = '${cpf}'`;
-			const person = await pool.query(sql);
+			person = await pool.query(sql);
 			if(person.rows.length === 0) {
 				return res.status(404).json({
 					message: "Not Found",
@@ -210,7 +211,7 @@ export const getPersonByCpf = async (req, res) => {
 		return res.status(200).json({
 			message: "Success",
 			data: {
-				enrollment: enrollment.rows,
+				enrollment: enrollment.rows || person.rows,
 				documents: documents.rows,
 				documentsNotSent
 			},
